@@ -1,0 +1,148 @@
+<!--
+	Description:  Request Headers to WebPageTest generator
+	Author: Paul Calvano, Web Peformance Architect @ Akamai
+	Contact:  pacalvan (at) akamai.com 
+-->
+
+<html>
+
+<head>
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.10.1.js"></script>
+	<style>
+		.txtarea{
+    max-width:100%;
+    min-height:200px;    
+    display:block;
+    width:100%;
+}
+
+.mydiv{
+    padding:10px;
+}
+
+.gen_btn{
+    padding:5px;
+    background-color:#743ED9;
+    color:white;
+    font-family:arial;
+    font-size:13px;
+    border:2px solid black;
+}
+
+.gen_btn:hover{
+    background-color:#9a64ff;
+}
+
+	</style>
+</head>
+<body>
+
+<table border=1>
+	<tr>
+		<td width=300>Instructions:<p>
+			<ol>
+				<li>Paste HTTP request headers for a page that you need scripted 
+				<li>Click on the Parse button					
+			<ol>
+		</td>
+		<td width=1000>
+			<form method="post" onSubmit="return parseHeaders();">
+				<textarea id="requestHeaders" class='txtarea'></textarea>
+				<p>
+				<input class='gen_btn' type="submit" value="Parse Request Headers">
+			</form>
+		</td>
+	</tr>
+
+	<tr>	
+
+		<td>
+			<ul>
+				<li>WebPageTest Script</li>	
+			</ul>	
+		</td>
+		<td>
+			<div class='mydiv'>    
+				  <textarea id="wptScript" class='txtarea'></textarea>
+			</div>	
+		</td>
+		
+	</tr>
+		
+</table>
+
+
+<script language="javascript">
+	function parseHeaders() {
+		// Get the HTTP request headers from the textarea field
+		var requestHeaders = document.getElementById("requestHeaders").value;
+		
+		// The lines array will contain all the request headers
+		var lines = requestHeaders.split('\n');
+		
+		var wptScript = "";
+		var navigateStep = "";
+		var setCookie = "";
+		var host_or_authority = "";
+		var GET_or_path = "";
+		var cookieNameValues = [];
+		// Loop through each request header
+		for(var i = 0; i < lines.length; i++) {		
+	
+			// H2 authority header
+			if(lines[i].indexOf(":authority:") == 0) {
+				var strArray = lines[i].split(":");
+        host_or_authority = strArray[2].replace(' ', '');
+			}
+			
+			// HTTP/1.1 Host header
+			if(lines[i].indexOf("Host") == 0) {
+				var strArray = lines[i].split(":");
+        host_or_authority = strArray[1].replace(' ', '');
+			}
+			
+			// H2 path header
+			if(lines[i].indexOf(":path:") == 0) {
+				var strArray = lines[i].split(":");
+        GET_or_path = strArray[2].replace(' ', '');
+			}
+			
+			// HTTP/1.1 GET line
+			if(lines[i].indexOf("GET") == 0) {
+				var strArray = lines[i].split(" ");
+        GET_or_path = strArray[1].replace(' ', '');
+			}
+
+			// Cookies
+			if(lines[i].toLowerCase().indexOf("cookie") == 0) {
+				if (lines[i].toLowerCase().indexOf("cookie: ") == 0) {
+					cookieString = lines[i].substr(8);
+				} else {
+					cookieString = lines[i].substr(7);
+				}
+				
+				var strArray = cookieString.split("; ");
+				for(var j = 0; j < strArray.length; j++) {
+					cookieNameValues[j] =  strArray[j];
+				}
+				
+			}
+		
+		}
+		
+		for(var k = 0; k < cookieNameValues.length; k++) {
+			setCookie += "setCookie\thttps://" + host_or_authority + "\t" + cookieNameValues[k] + "\n";
+		}
+		
+		navigateStep = "navigate https://" + host_or_authority + GET_or_path;
+		wptScript =  setCookie + "\n" + navigateStep;
+		document.getElementById("wptScript").value = wptScript;
+			
+		return false;
+	}
+	
+		
+</script>
+</body>
+</html>
