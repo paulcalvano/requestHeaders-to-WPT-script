@@ -5,7 +5,7 @@ When running [WebPageTest](https://webpagetest.org) as a return visitor, sometim
 While adding this script step is fairly simple, sometimes the page you are trying to test has a large number of cookies. This can become cumbersome. This  utility parses HTTP request headers to generate a [WebPageTest](https://webpagetest.org) script that includes all of the requested cookies. It can parse both HTTP/1.1 and HTTP/2 request headers (the main differences are case sensitivity in header names and use of `:authority` and `:path` for HTTP/2 instead of `Host` and the the path from the `GET`line in HTTP/1.1)
 
 
-http://htmlpreview.github.io/?https://github.com/paulcalvano/requestHeaders-to-WPT-script/request-headers-to-wpt-script.html
+http://htmlpreview.github.io/?https://github.com/paulcalvano/requestHeaders-to-WPT-script/blob/master/request-headers-to-wpt-script.html
 
 Instructions:
 
